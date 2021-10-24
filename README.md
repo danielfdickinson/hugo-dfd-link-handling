@@ -4,7 +4,11 @@ A module for handling links in Hugo
 
 ## Status
 
-TBD
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b54490a1-f9ec-4783-ace8-cf70ead68db7/deploy-status)](https://app.netlify.com/sites/hugo-dfd-link-handling/deploys)
+
+## Demo Site
+
+<https://hugo-dfd-link-handling.wildtechgarden.ca>
 
 ## Features
 
