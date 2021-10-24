@@ -1,6 +1,6 @@
 # DFD Hugo Link Handling
 
-A repo for handling links in Hugo
+A module for handling links in Hugo
 
 ## Status
 
