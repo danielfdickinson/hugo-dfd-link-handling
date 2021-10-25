@@ -2,7 +2,7 @@
 title: "Test Render Link Render Hook"
 date: 2021-10-17T10:14:26Z
 publishDate: 2021-10-17T10:14:26Z
-author:
+author: Daniel F. Dickinson
 categories:
     - Demonstration
 tags:
