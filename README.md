@@ -10,6 +10,10 @@ A module for handling links in Hugo
 
 <https://hugo-dfd-link-handling.wildtechgarden.ca>
 
+## GitHub Repository
+
+<https://github.com/danielfdickinson/hugo-dfd-link-handling>
+
 ## Features
 
 TBD
