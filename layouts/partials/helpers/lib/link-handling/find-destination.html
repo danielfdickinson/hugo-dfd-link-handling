@@ -1,0 +1,77 @@
+{{- $ctx := . -}}
+{{- $inPage := .page -}}
+{{- $inDestination := .destination -}}
+{{- /* For internal links we:
+         1. Check of the link points to a file
+            a. If it does, we find the relLangURL (that is the URL of the page relative
+            the to site root (/ or baseURL))
+            b. If it does not, we check for any assets (site-wide .Resources) or 
+               page resources that match the link (e.g. from a page bundle)
+               i. If there are we use the assets relative permalink (again relative to
+               site root (/ or baseURL))
+         2. If nothing matched, we just use the link as it was given to us
+    */
+-}}
+{{- /* For external (http://, https://, or mailto:) links we just use the link as is */ -}}
+{{- $external := or (hasPrefix $inDestination "http") (hasPrefix $inDestination "mailto:") -}}
+{{- $destination := $inDestination -}}
+{{- $tryResource := false -}}
+{{- /* We need to know the internal URL without any fragments (e.g. without #an-anchor) */ -}}
+{{- with $inPage -}}
+    {{- $path := (index (split $destination "#") 0) -}}
+    {{- /* In a URL only a single unescaped '#' is valid, so this should work */ -}}
+    {{- $fragment := (index (split $destination "#") 1) -}}
+    {{- /* If we have a URL (not including fragment) */ -}}
+    {{- if $path -}}
+        {{- if not $external -}}{{- /* only try to find resources for internal links */ -}}
+            {{- /* fileExists operates relative to site root not relative to content directory */ -}}
+            {{- $filePath := (path.Join "content" (.File.Path) $path) -}}{{- /* For links relative to the current page */ -}}
+            {{- if hasPrefix $path "/" -}}{{- /* For links relative to the output site root (e.g. /post/some-post) */ -}}
+                {{- $filePath = (path.Join "content" $path) -}}
+            {{- end -}}
+            {{- $isFile := false -}}
+            {{- $tryResource := false -}}
+            {{- if not (fileExists $filePath) -}}
+                {{- if fileExists (printf "%s.md" $filePath) -}}{{- /* Check if it is a Markdown content page */ -}}
+                    {{- $isFile = true -}}
+                {{- end -}}
+            {{- else -}}{{- /* Usually a link to an image or other non-page asset */ -}}
+                {{- $isFile = true -}}
+            {{- end -}}
+            {{- if not $isFile -}}
+                {{- $tryResource = true -}}
+            {{- else -}}{{- /* If the file exists */ -}}
+                {{- if eq (path.Ext $path) ".md" -}}{{- /* For markdown content pages */ -}}
+                    {{- if not (hasPrefix $path "/") -}}
+                        {{- $destination = (printf "%s/%s" (.RelPermalink) (strings.TrimSuffix ".md" $path)) | relLangURL -}}
+                    {{- else -}}
+                        {{- $destination = (strings.TrimSuffix ".md" $path) | relLangURL -}}
+                    {{- end -}}
+                {{- else -}}{{- /* for anything other than a Markdown content page (e.g. images) */ -}}
+                    {{- if not (hasPrefix $path "/") -}}
+                        {{- $destination = (printf "%s/%s" (.RelPermalink) $path) | relLangURL -}}
+                    {{- else -}}
+                        {{- $destination = $path | relLangURL -}}
+                    {{- end -}}
+                {{- end -}}
+                {{- if $fragment -}}
+                    {{- $destination = printf "%s#%s" $destination $fragment -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- /* If we have do not have a URL but do have a fragment */ -}}
+    {{- else if $fragment -}}{{- /* For a bare fragment, we know it is for this page */ -}}
+        {{- $destination = printf "%s#%s" (.RelPermalink) $fragment -}}
+    {{- end -}}
+    {{- if $tryResource -}}{{- /* We didn't find a matching file and it is an internal link */ -}}
+        {{- $destResource := resources.Get $path -}}{{- /* Look for a match in the 'assets' dir */ -}}
+        {{- if not $destResource -}}{{- /* otherwise look in current page bundle */ -}}
+            {{- $destResource = .Resources.GetMatch (printf "*%s*" $path) -}}
+        {{- end -}}
+        {{- if $destResource -}}
+            {{- $destination = $destResource.RelPermalink -}}{{- /* We found a resource, so use it's relative permalink */ -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- return $destination -}}
+{{- /* Drop trailing newlines */ -}}
