@@ -15,6 +15,7 @@
 {{- $external := or (hasPrefix $inDestination "http") (hasPrefix $inDestination "mailto:") -}}
 {{- $destination := $inDestination -}}
 {{- $tryResource := false -}}
+{{- $isFile := false -}}
 {{- /* We need to know the internal URL without any fragments (e.g. without #an-anchor) */ -}}
 {{- with $inPage -}}
     {{- $path := (index (split $destination "#") 0) -}}
@@ -24,20 +25,24 @@
     {{- if $path -}}
         {{- if not $external -}}{{- /* only try to find resources for internal links */ -}}
             {{- /* fileExists operates relative to site root not relative to content directory */ -}}
-            {{- $filePath := (path.Join "content" (.File.Path) $path) -}}{{- /* For links relative to the current page */ -}}
+            {{- $filePath := (path.Join "/content" (.Site.LanguagePrefix) (.File.Path) $path) -}}{{- /* For links relative to the current page */ -}}
             {{- if hasPrefix $path "/" -}}{{- /* For links relative to the output site root (e.g. /post/some-post) */ -}}
-                {{- $filePath = (path.Join "content" $path) -}}
+                {{- $filePath = (path.Join "/content" (.Site.LanguagePrefix) $path) -}}
+            {{- else -}}
+                {{- $filePath = path.Join "/content" (.Site.LanguagePrefix) (.File.Path) ".." $path -}}
             {{- end -}}
-            {{- $isFile := false -}}
             {{- if not (fileExists $filePath) -}}
-                {{- if fileExists (printf "%s.md" $filePath) -}}{{- /* Check if it is a Markdown content page */ -}}
+                {{- if or (fileExists (printf "%s.md" $filePath)) (fileExists (path.Join $filePath "_index.md")) (fileExists (path.Join $filePath "index.md")) -}}{{- /* Check if it is a Markdown content page */ -}}
                     {{- $isFile = true -}}
                 {{- end -}}
             {{- else -}}{{- /* Usually a link to an image or other non-page asset */ -}}
                 {{- $isFile = true -}}
             {{- end -}}
+
             {{- if not $isFile -}}
-                {{- $tryResource = true -}}
+                {{- if not (or .Data.Singular .Data.Plural .Data.Terms) -}}
+                    {{- $tryResource = true -}}
+                {{- end -}}
             {{- else -}}{{- /* If the file exists */ -}}
                 {{- if eq (path.Ext $path) ".md" -}}{{- /* For markdown content pages */ -}}
                     {{- if not (hasPrefix $path "/") -}}
@@ -47,7 +52,7 @@
                     {{- end -}}
                 {{- else -}}{{- /* for anything other than a Markdown content page (e.g. images) */ -}}
                     {{- if not (hasPrefix $path "/") -}}
-                        {{- $destination = (printf "%s/%s" (.RelPermalink) $path) | relLangURL -}}
+                        {{- $destination = (path.Join .RelPermalink $path) | relLangURL -}}
                     {{- else -}}
                         {{- $destination = $path | relLangURL -}}
                     {{- end -}}
@@ -64,7 +69,10 @@
     {{- if $tryResource -}}{{- /* We didn't find a matching file and it is an internal link */ -}}
         {{- $destResource := resources.Get $path -}}{{- /* Look for a match in the 'assets' dir */ -}}
         {{- if not $destResource -}}{{- /* otherwise look in current page bundle */ -}}
-            {{- $destResource = .Resources.GetMatch (printf "*%s*" $path) -}}
+            {{- $destResource = .Resources.GetMatch (printf "*%s*" (path.Base $path)) -}}
+        {{- end -}}
+        {{- if not $destResource -}}
+            {{- $destination = .Site.GetPage $path -}}
         {{- end -}}
         {{- if $destResource -}}
             {{- $destination = $destResource.RelPermalink -}}{{- /* We found a resource, so use it's relative permalink */ -}}
