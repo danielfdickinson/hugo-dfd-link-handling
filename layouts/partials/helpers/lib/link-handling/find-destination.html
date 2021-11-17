@@ -2,7 +2,7 @@
 {{- $inPage := .page -}}
 {{- $inDestination := .destination -}}
 {{- /* For internal links we:
-         1. Check of the link points to a file
+         1. Check if the link points to a file
             a. If it does, we find the relLangURL (that is the URL of the page relative
             the to site root (/ or baseURL))
             b. If it does not, we check for any assets (site-wide .Resources) or 
@@ -10,8 +10,7 @@
                i. If there are we use the assets relative permalink (again relative to
                site root (/ or baseURL))
          2. If nothing matched, we just use the link as it was given to us
-    */
--}}
+    */ -}}
 {{- /* For external (http://, https://, or mailto:) links we just use the link as is */ -}}
 {{- $external := or (hasPrefix $inDestination "http") (hasPrefix $inDestination "mailto:") -}}
 {{- $destination := $inDestination -}}
@@ -30,7 +29,6 @@
                 {{- $filePath = (path.Join "content" $path) -}}
             {{- end -}}
             {{- $isFile := false -}}
-            {{- $tryResource := false -}}
             {{- if not (fileExists $filePath) -}}
                 {{- if fileExists (printf "%s.md" $filePath) -}}{{- /* Check if it is a Markdown content page */ -}}
                     {{- $isFile = true -}}
@@ -71,6 +69,9 @@
         {{- if $destResource -}}
             {{- $destination = $destResource.RelPermalink -}}{{- /* We found a resource, so use it's relative permalink */ -}}
         {{- end -}}
+        {{- if not $destResource -}}
+            {{- errorf (print "Couldn't find link '" $path "' for '" .Page.File.Path "'") -}}
+        {{- end -}}            
     {{- end -}}
 {{- end -}}
 {{- return $destination -}}

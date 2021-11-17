@@ -4,7 +4,7 @@ cd exampleSite && HUGO_MINIFY_TDEWOLFF_HTML_KEEPCOMMENTS=true HUGO_ENABLEMISSING
 
 if [ "$RET" != "0" ]
 then
-    hugo server --poll 700ms -b http://localhost:8888/ -w "$@"
+    hugo server -b http://localhost:8888/ -w "$@"
 else
     cd ..
 fi

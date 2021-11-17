@@ -21,16 +21,7 @@
 {{- else if eq $wrapperElement "span" -}}
 <span{{ with $inWrapperClass }} class="{{ . }}"{{ end }}>
 {{- end }}
-{{- partial "helpers/link-open" (dict
-        "page" $inPage
-        "destination" $inDestination
-        "title" $inTitle
-        "text" $inText
-        "rel" $inRel
-        "target" $inTarget
-        "linkElement" $inLinkElement
-        "class" $inLinkClass
-    ) -}}
+{{- partial "helpers/link-open" (dict "page" $inPage "destination" $inDestination "title" $inTitle "text" $inText "rel" $inRel "target" $inTarget "linkElement" $inLinkElement "class" $inLinkClass) -}}
 {{- if eq $wrapperElement "div" -}}
 </div>
 {{- else if eq $wrapperElement "span" -}}
