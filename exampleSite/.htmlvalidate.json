@@ -15,12 +15,7 @@
     ],
     "rules": {
         "svg-focusable": "off",
-        "no-raw-characters": [
-                "error",
-                {
-                    "relaxed": true
-                }
-        ],
+        "no-raw-characters": "off",
         "require-sri": "off",
         "void-style": "off",
         "no-trailing-whitespace": "off",
