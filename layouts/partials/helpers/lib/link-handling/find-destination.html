@@ -78,7 +78,18 @@
             {{- $destination = $destResource.RelPermalink -}}{{- /* We found a resource, so use it's relative permalink */ -}}
         {{- end -}}
         {{- if not $destResource -}}
-            {{- errorf (print "Couldn't find link '" $path "' for '" .Page.File.Path "'") -}}
+            {{- $notFound := true -}}
+            {{- if or (eq (path.Base $path) "index.xml") (eq (path.Base $path) "sitemap.xml") -}}
+                {{- $notFound = false -}}
+            {{- end -}}
+            {{- range $taxonomyName, $taxonomy := .Site.Taxonomies -}}
+                {{- if or (hasPrefix $path $taxonomyName) (hasPrefix $path (printf "/%s" $taxonomyName)) -}}
+                    {{- $notFound = false -}}
+                {{- end -}}
+            {{- end -}}
+            {{- if $notFound -}}
+                {{- errorf (print "Couldn't find link '" $path "' for '" .Page.File.Path "'") -}}
+            {{- end -}}
         {{- end -}}            
     {{- end -}}
 {{- end -}}
