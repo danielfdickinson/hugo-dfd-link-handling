@@ -44,19 +44,7 @@
                     {{- $tryResource = true -}}
                 {{- end -}}
             {{- else -}}{{- /* If the file exists */ -}}
-                {{- if eq (path.Ext $path) ".md" -}}{{- /* For markdown content pages */ -}}
-                    {{- if not (hasPrefix $path "/") -}}
-                        {{- $destination = (printf "%s/%s" (.RelPermalink) (strings.TrimSuffix ".md" $path)) | relLangURL -}}
-                    {{- else -}}
-                        {{- $destination = (strings.TrimSuffix ".md" $path) | relLangURL -}}
-                    {{- end -}}
-                {{- else -}}{{- /* for anything other than a Markdown content page (e.g. images) */ -}}
-                    {{- if not (hasPrefix $path "/") -}}
-                        {{- $destination = (path.Join .RelPermalink $path) | relLangURL -}}
-                    {{- else -}}
-                        {{- $destination = $path | relLangURL -}}
-                    {{- end -}}
-                {{- end -}}
+                {{- $destination = (strings.TrimSuffix ".md" (strings.TrimPrefix "/content" $filePath)) | relLangURL -}}
                 {{- if $fragment -}}
                     {{- $destination = printf "%s#%s" $destination $fragment -}}
                 {{- end -}}
