@@ -60,7 +60,7 @@
             {{- $destResource = .Resources.GetMatch (printf "*%s*" (path.Base $path)) -}}
         {{- end -}}
         {{- if not $destResource -}}
-            {{- $destination = .Site.GetPage $path -}}
+            {{- $destResource = .Site.GetPage $path -}}
         {{- end -}}
         {{- if $destResource -}}
             {{- $destination = $destResource.RelPermalink -}}{{- /* We found a resource, so use it's relative permalink */ -}}
