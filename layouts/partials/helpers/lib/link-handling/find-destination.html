@@ -46,7 +46,11 @@
             {{- else -}}{{- /* If the file exists */ -}}
                 {{- $destination = (strings.TrimSuffix ".md" (strings.TrimPrefix "/content" $filePath)) | relLangURL -}}
                 {{- if $fragment -}}
-                    {{- $destination = printf "%s#%s" $destination $fragment -}}
+                    {{- if ne (path.Ext $destination) "" -}}
+                        {{- $destination = printf "%s#%s" $destination $fragment -}}
+                    {{- else -}}
+                        {{- $destination = printf "%s/#%s" $destination $fragment -}}
+                    {{- end -}}
                 {{- end -}}
             {{- end -}}
         {{- end -}}
@@ -64,6 +68,13 @@
         {{- end -}}
         {{- if $destResource -}}
             {{- $destination = $destResource.RelPermalink -}}{{- /* We found a resource, so use it's relative permalink */ -}}
+            {{- if $fragment -}}
+                {{- if ne (path.Ext $destination) "" -}}
+                    {{- $destination = printf "%s#%s" $destination $fragment -}}
+                {{- else -}}
+                    {{- $destination = printf "%s/#%s" $destination $fragment -}}
+                {{- end -}}
+            {{- end -}}
         {{- end -}}
         {{- if not $destResource -}}
             {{- $notFound := true -}}
