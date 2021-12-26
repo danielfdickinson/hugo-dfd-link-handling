@@ -4,7 +4,9 @@ A module for handling links in Hugo
 
 ## Status
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/b54490a1-f9ec-4783-ace8-cf70ead68db7/deploy-status)](https://app.netlify.com/sites/hugo-dfd-link-handling/deploys)
+ARCHIVED: This module has been renamed and moved to <https://github.com/link-handling-mod-hugo-dfd>.
+
+This repo remains (although archived) for the benefit of other archived repos that depend on it.
 
 ## Demo Site
 
